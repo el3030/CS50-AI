@@ -96,7 +96,7 @@ def shortest_path(source, target):
     frontier = QueueFrontier()
     start = Node(source, None, None)
     frontier.add(start)
-    num_explored = 0
+
     
 
     # Initialize an empty explored set
@@ -111,31 +111,20 @@ def shortest_path(source, target):
     
         # Choose a node from the frontier
         node = frontier.remove()
-        num_explored+=1
+ 
         # If node is the goal, then we have a solution
-        if node.state == target:
-            actor_path = []
-            movie_path = []
-
-            while node.parent is not None:
-                actor_path.append(node.state)
-                movie_path.append(node.action)
-                node = node.parent
-
-            actor_path.reverse()
-            movie_path.reverse()
-            solution = []
-            for (movie,actor) in zip(movie_path, actor_path):
-                solution.append((movie, actor))
-            return solution
-
-        explored.add(node.state)
-
-        for action,state in neighbors_for_person(node.state):
-            if action==None or state==None:
-                return None
-            elif not frontier.contains_state(state) and state not in explored:
-                child = Node(state=state, parent=node, action=action)
+        neighbors = neighbors_for_person(node.state)
+        for movie,actor in neighbors:
+            if actor not in explored and not frontier.contains_state(actor):
+                child=Node(actor,node,movie)
+                if child.state==target:
+                    path=[]
+                    node=child
+                    while node.parent is not None:
+                        path.append((node.action,node.state))
+                        node=node.parent
+                    path.reverse()
+                    return path
                 frontier.add(child)
 
     
